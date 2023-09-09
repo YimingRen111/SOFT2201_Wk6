@@ -10,13 +10,17 @@ public class Ball {
     private double yVel;
     private Paint colour;
 
-    Ball(double startX, double startY, double startRadius, Paint colour) {
+    private MovementStrategy strategy;
+    private BallPit ballPit;
+
+    Ball(double startX, double startY, double startRadius, Paint colour, BallPit ballPit) {
         this.xPos = startX;
         this.yPos = startY;
         this.radius = startRadius;
         this.colour = colour;
-        xVel = new Random().nextInt(5);
-        yVel = new Random().nextInt(5);
+        this.ballPit = ballPit;
+        xVel = new Random().nextInt(10);
+        yVel = new Random().nextInt(10);
     }
 
     void tick() {
@@ -64,9 +68,17 @@ public class Ball {
         this.yPos = yPos;
     }
 
-    void think() {
-        // Here is where the strategy should have some effect.
-        // You can add parameters to the think method so the ball knows something about its
-        // world to make decisions with, or you can inject things upon construction for it to query
+
+    public void setStrategy(MovementStrategy strategy) {
+        this.strategy = strategy;
     }
+
+    public MovementStrategy getStrategy() {
+        return this.strategy;
+    }
+
+    public void think() {
+        strategy.move(this, ballPit);
+    }
+
 }

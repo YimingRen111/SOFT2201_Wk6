@@ -17,9 +17,16 @@ class BallPit {
 
         g = 1.0 * frameDuration;
 
-        balls.add(new Ball(100, 100, 20, Paint.valueOf("ORANGE")));
-        balls.add(new Ball(200, 200, 20, Paint.valueOf("PURPLE")));
-        balls.add(new Ball(300, 300, 20, Paint.valueOf("BLACK")));
+        Ball Ball_Orange = new Ball(100, 100, 20, Paint.valueOf("ORANGE"), this);
+        Ball Ball_Purple = new Ball(200, 200, 20, Paint.valueOf("PURPLE"),this);
+        Ball Ball_Black = new Ball(300, 300, 20, Paint.valueOf("BLACK"),this);
+        Ball_Orange.setStrategy(new OrangeBallStrategy());
+        Ball_Purple.setStrategy(new PurpleBallStrategy());
+        Ball_Black.setStrategy(new BlackBallStrategy());
+        
+        balls.add(Ball_Orange);
+        balls.add(Ball_Purple);
+        balls.add(Ball_Black);
     }
 
     double getHeight() {
@@ -128,9 +135,28 @@ class BallPit {
         Point2D deltaVA = collisionVector.multiply(mR * (vB - root));
         Point2D deltaVB = collisionVector.multiply(root - vB);
 
-        ballA.setxVel(ballA.getxVel() + deltaVA.getX());
-        ballA.setyVel(ballA.getyVel() + deltaVA.getY());
-        ballB.setxVel(ballB.getxVel() + deltaVB.getX());
-        ballB.setyVel(ballB.getyVel() + deltaVB.getY());
+        if (ballA.getColour() == Paint.valueOf("PURPLE")) {
+            ((PurpleBallStrategy) ballA.getStrategy()).freeze();
+        }
+        if (ballB.getColour() == Paint.valueOf("PURPLE")) {
+            ((PurpleBallStrategy) ballB.getStrategy()).freeze();
+        }
+
+        if (ballA.getColour() == Paint.valueOf("BLACK")) {
+            // Only update ballB's velocity
+            ballB.setxVel(ballB.getxVel() + deltaVB.getX());
+            ballB.setyVel(ballB.getyVel() + deltaVB.getY());
+        } else if (ballB.getColour() == Paint.valueOf("BLACK")) {
+            // Only update ballA's velocity
+            ballA.setxVel(ballA.getxVel() + deltaVA.getX());
+            ballA.setyVel(ballA.getyVel() + deltaVA.getY());
+        } else {
+            // Normal collision logic for two non-black balls
+            ballA.setxVel(ballA.getxVel() + deltaVA.getX());
+            ballA.setyVel(ballA.getyVel() + deltaVA.getY());
+            ballB.setxVel(ballB.getxVel() + deltaVB.getX());
+            ballB.setyVel(ballB.getyVel() + deltaVB.getY());
+        }
+
     }
 }
